@@ -1,0 +1,17 @@
+{% load rest_framework %}
+<html>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+<body>
+<h1>Snippets</h1>
+<ul>
+    {% for snippet in snippets %}
+    <li><a href="{% url 'snippet-detail' pk=snippet.id %}">{{ snippet.id }}</a></li>
+    {% endfor %}
+</ul>
+<form action = "{% url 'snippet-list' %}" method="POST">
+    {% csrf_token %}
+    {% render_form serializer template_pack='rest_framework/vertical' %}
+    <input type="submit" value="Save">
+</form>
+</body></html>

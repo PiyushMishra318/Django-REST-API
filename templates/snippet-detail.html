@@ -1,0 +1,19 @@
+{% load rest_framework %}
+
+<html>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<body>
+
+<h1>Snippet-{{snippet.id}}</h1>
+
+<form action = "{% url 'snippet-detail' pk=snippet.pk %}" method="POST">
+    {% csrf_token %}
+    {% render_form serializer template_pack='rest_framework/vertical' %}
+    <input type="submit" value="Save">
+</form>
+<form action = "{% url 'snippet-delete' pk=snippet.pk %}" method="post">
+  {% csrf_token %}
+  <input type="submit" value="delete">
+</form>
+
+</body></html>
