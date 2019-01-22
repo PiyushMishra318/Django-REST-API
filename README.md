@@ -1,2 +1,2 @@
 # Django-REST-API
-Django REST Framework API for snippets which are renders in HTML Pages
+Django REST Framework API for snippets which are rendered in HTML Pages
