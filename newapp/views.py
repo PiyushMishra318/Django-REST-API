@@ -1,66 +1,45 @@
-from newapp.models import Snippets
-from newapp.serializers import SnippetSerializer
-from rest_framework import generics
-from django.shortcuts import get_object_or_404
-from rest_framework import permissions
-from newapp.permissions import IsOwnerOrReadOnly
-from rest_framework.decorators import api_view
+from django.contrib.auth.models import User
+from rest_framework import generics, permissions, renderers, viewsets
+from rest_framework.decorators import api_view, detail_route
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from rest_framework import renderers
-from rest_framework.renderers import TemplateHTMLRenderer
-from newapp.models import Snippets
-from django.http import Http404
-from rest_framework.views import APIView
-from rest_framework import status
+from django.shortcuts import render,redirect
 
-@api_view(['GET'])
-def api_root(request, format=None):
-    return Response({
-        'snippets': reverse('snippet-list', request=request, format=format)
-    })
+from newapp.models import Snippet
+from newapp.permissions import IsOwnerOrReadOnly
+from newapp.serializers import SnippetSerializer, UserSerializer
 
-class SnippetList(APIView):
+
+class SnippetViewSet(viewsets.ModelViewSet):
     """
-    List all snippets, or create a new snippet.
+    This viewset automatically provides `list`, `create`, `retrieve`,
+    `update` and `destroy` actions.
+
+    Additionally we also provide an extra `highlight` action.
     """
-    renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'snippet-list.html'
-    def get(self, request, format=None):
-        snippets = Snippets.objects.all()
-        serializer = SnippetSerializer()
-        return Response({'serializer':serializer,'snippets':snippets})
+    queryset = Snippet.objects.all()
+    serializer_class = SnippetSerializer
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrReadOnly, )
 
-    def post(self, request, format=None):
-        snippets = Snippets.objects.all()
-        serializer = SnippetSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'serializer': serializer,'snippets':snippets})
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    @detail_route(renderer_classes=[renderers.StaticHTMLRenderer])
+    def highlight(self, request, *args, **kwargs):
+        snippet = self.get_object()
+        return Response(snippet.highlighted)
 
-class SnippetDetail(APIView):
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    Retrieve, update or delete a snippet instance.
+    This viewset automatically provides `list` and `detail` actions.
     """
-    renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'snippet-detail.html'
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
-    def get(self, request, pk, format=None):
-        snippet = get_object_or_404(Snippets, pk=pk)
-        serializer = SnippetSerializer(snippet)
-        return Response({'serializer': serializer, 'snippet': snippet})
 
-    def post(self, request, pk, format=None):
-        snippet = get_object_or_404(Snippets, pk=pk)
-        serializer = SnippetSerializer(snippet, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'serializer': serializer, 'snippet': snippet})
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class SnippetDelete(APIView):
-    def post(self, request, pk, format=None):
-        snippet = get_object_or_404(Snippets, pk=pk)
-        snippet.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+def Feed(request):
+    return render(request,'feed.html')

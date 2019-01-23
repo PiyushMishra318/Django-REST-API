@@ -6,7 +6,7 @@
 <h1>Snippets</h1>
 <ul>
     {% for snippet in snippets %}
-    <li><a href="{% url 'snippet-detail' pk=snippet.id %}">{{ snippet.id }}</a></li>
+    <li><a href="">{{ snippet.id }}</a></li>
     {% endfor %}
 </ul>
 <form action = "{% url 'snippet-list' %}" method="POST">
