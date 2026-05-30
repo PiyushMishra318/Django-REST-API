@@ -1,6 +1,9 @@
-# Django-REST-API
-Django REST Framework API for snippets which are rendered in HTML Pages
+# ARCHIVED
 
-# What I Learned
-* CRUD
-* Making an API
+This repository has been archived. Development continues in the consolidated monorepo:
+
+**[django-learning-projects](https://github.com/PiyushMishra318/django-learning-projects)**
+
+The Django REST API project now lives at:
+
+**[django-learning-projects/django-rest-api](https://github.com/PiyushMishra318/django-learning-projects/tree/main/django-rest-api)**
